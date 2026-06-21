@@ -45,22 +45,60 @@ class ProposalApp {
     // Wire up typing sound callback
     this.overlay.setOnTypeCallback(() => this.audio.playTypeClick());
 
+    // On first user gesture, try to init audio (browser may require gesture for AudioContext)
+    this._setupFirstInteractionAudio();
+
     this._animate();
 
     await this._wait(TIMING.loadingDuration);
     this.overlay.hideLoading();
 
-    // Initialize audio and auto-start music (non-blocking)
-    try {
-      this.audio.init();
-      await this.audio._ensureResumed();
-      this.audio.unmute();
-      this.audio.startMusic();
-    } catch (_) {
-      // Audio not available — app still works perfectly
-    }
+    // Initialize audio — fire-and-forget, never blocks the act sequence
+    this._initAudioAsync();
 
     this._startActSequence();
+  }
+
+  /**
+   * On first user click/touch, try to init + resume audio.
+   * Browsers often require a user gesture before playing sound.
+   * This ensures music starts on the first interaction (skip button, clicking, etc.)
+   */
+  _setupFirstInteractionAudio() {
+    const handler = () => {
+      if (!this.audio._initialized) {
+        this.audio.init();
+      }
+      this.audio._ensureResumed().then(() => {
+        this.audio.unmute();
+        this.audio.startMusic();
+      });
+      document.removeEventListener('click', handler);
+      document.removeEventListener('touchstart', handler);
+    };
+    document.addEventListener('click', handler);
+    document.addEventListener('touchstart', handler);
+  }
+
+  /**
+   * Initialize audio in the background — never blocks the act sequence.
+   * Uses a timeout guard so a stuck ctx.resume() can't freeze the app.
+   */
+  _initAudioAsync() {
+    (async () => {
+      try {
+        this.audio.init();
+        // Timeout guard: if resume() hangs, skip audio after 2s
+        await Promise.race([
+          this.audio._ensureResumed(),
+          this._wait(2000),
+        ]);
+        this.audio.unmute();
+        this.audio.startMusic();
+      } catch (_) {
+        // Audio not available — app still works perfectly
+      }
+    })();
   }
 
   // ============================================
