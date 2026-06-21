@@ -1,0 +1,39 @@
+01:00:20.832 Running build in Washington, D.C., USA (East) – iad1
+01:00:20.833 Build machine configuration: 2 cores, 8 GB
+01:00:20.992 Cloning github.com/aliihtsham-debug/hijab (Branch: main, Commit: ec3573d)
+01:00:21.296 Cloning completed: 303.000ms
+01:00:21.531 Restored build cache from previous deployment (3rmPEcA3ughntZ4XLc4vdrPmqWCZ)
+01:00:21.911 Running "vercel build"
+01:00:21.939 Vercel CLI 54.14.0
+01:00:22.713 Installing dependencies...
+01:00:23.602 
+01:00:23.603 up to date in 711ms
+01:00:23.604 
+01:00:23.604 5 packages are looking for funding
+01:00:23.605   run `npm fund` for details
+01:00:23.656 Running "npm run build"
+01:00:23.815 
+01:00:23.816 > hijab-proposal@1.0.0 build
+01:00:23.816 > vite build
+01:00:23.817 
+01:00:24.186 vite v6.4.3 building for production...
+01:00:24.293 transforming...
+01:00:26.630 ✓ 17 modules transformed.
+01:00:27.164 rendering chunks...
+01:00:27.182 computing gzip size...
+01:00:27.207 dist/index.html                   2.87 kB │ gzip:   1.19 kB
+01:00:27.207 dist/assets/index-BqHd5nGb.css    6.11 kB │ gzip:   1.86 kB
+01:00:27.208 dist/assets/index-DsVzn3kN.js   599.43 kB │ gzip: 163.00 kB
+01:00:27.208 
+01:00:27.209 (!) Some chunks are larger than 500 kB after minification. Consider:
+01:00:27.209 - Using dynamic import() to code-split the application
+01:00:27.209 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+01:00:27.209 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+01:00:27.209 ✓ built in 2.98s
+01:00:27.377 Build Completed in /vercel/output [5s]
+01:00:27.503 Deploying outputs...
+01:00:28.369 Deployment completed
+01:00:28.513 Creating build cache...
+01:00:31.529 Created build cache: 3s
+01:00:31.529 Uploading build cache [14.74 MB]
+01:00:32.426 Build cache uploaded: 908.000ms

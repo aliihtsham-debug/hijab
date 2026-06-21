@@ -52,9 +52,13 @@ class ProposalApp {
     this.overlay.hideLoading();
     this.overlay.showMusicToggle();
 
-    // Initialize audio (creates context, starts music muted)
-    await this.audio.init();
-    this.audio.startMusic();
+    // Initialize audio (non-blocking — app works even if audio fails)
+    try {
+      this.audio.init();
+      this.audio.startMusic();
+    } catch (_) {
+      // Audio not available — app still works perfectly
+    }
 
     this._startActSequence();
   }
@@ -224,8 +228,8 @@ class ProposalApp {
   _onYes(intensity) {
     this.celebrationActive = true;
 
-    // 0. Play celebration fanfare
-    this.audio.playCelebration();
+    // 0. Play celebration fanfare (safe — wrapped internally)
+    if (this.audio) this.audio.playCelebration();
 
     // 1. Explode hearts
     this.hearts.explode();
@@ -417,8 +421,12 @@ class ProposalApp {
   // ============================================
 
   async _toggleMusic() {
-    const muted = await this.audio.toggleMute();
-    this.overlay.setMuted(muted);
+    try {
+      const muted = await this.audio.toggleMute();
+      this.overlay.setMuted(muted);
+    } catch (_) {
+      // Audio toggle failed — not critical
+    }
   }
 
   _wait(ms) {
