@@ -41,7 +41,6 @@ class ProposalApp {
 
     this.overlay.onYes((intensity) => this._onYes(intensity));
     this.overlay.enableSkip();
-    this.overlay.onMusicToggle(() => this._toggleMusic());
 
     // Wire up typing sound callback
     this.overlay.setOnTypeCallback(() => this.audio.playTypeClick());
@@ -50,11 +49,12 @@ class ProposalApp {
 
     await this._wait(TIMING.loadingDuration);
     this.overlay.hideLoading();
-    this.overlay.showMusicToggle();
 
-    // Initialize audio (non-blocking — app works even if audio fails)
+    // Initialize audio and auto-start music (non-blocking)
     try {
       this.audio.init();
+      await this.audio._ensureResumed();
+      this.audio.unmute();
       this.audio.startMusic();
     } catch (_) {
       // Audio not available — app still works perfectly
@@ -420,14 +420,6 @@ class ProposalApp {
   // UTILITIES
   // ============================================
 
-  async _toggleMusic() {
-    try {
-      const muted = await this.audio.toggleMute();
-      this.overlay.setMuted(muted);
-    } catch (_) {
-      // Audio toggle failed — not critical
-    }
-  }
 
   _wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));

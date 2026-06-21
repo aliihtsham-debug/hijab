@@ -173,6 +173,14 @@ export default class AudioManager {
     }, 600);
   }
 
+  /** Unmute and fade music in */
+  unmute() {
+    if (!this.ctx || !this.masterGain) return;
+    this.muted = false;
+    this.masterGain.gain.setValueAtTime(0, this.ctx.currentTime);
+    this.masterGain.gain.linearRampToValueAtTime(1, this.ctx.currentTime + 1);
+  }
+
   // ============================================
   // SOUND EFFECTS
   // ============================================

@@ -20,7 +20,6 @@ export default class Overlay {
     this.nameSubtitle = document.getElementById('name-subtitle');
     this.proposalCard = new ProposalCard();
     this.celebration = document.getElementById('celebration');
-    this.musicToggle = document.getElementById('music-toggle');
     this.skipBtn = document.getElementById('skip-btn');
 
     // Typing text controller
@@ -66,18 +65,6 @@ export default class Overlay {
     return this._skipRequested;
   }
 
-  showMusicToggle() {
-    this.musicToggle.classList.remove('hidden');
-  }
-
-  setMuted(muted) {
-    const icon = document.getElementById('music-icon');
-    icon.textContent = muted ? '🔇' : '🔊';
-  }
-
-  onMusicToggle(callback) {
-    this.musicToggle.addEventListener('click', callback);
-  }
 
   // ---- Transition between acts ----
   async transitionToAct(act) {
