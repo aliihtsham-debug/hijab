@@ -101,6 +101,24 @@ class ProposalApp {
     })();
   }
 
+  /**
+   * Open WhatsApp with Hijab's response.
+   * Uses the WhatsApp click-to-chat API (wa.me) — works on mobile and desktop.
+   */
+  _sendWhatsAppMessage(intensity) {
+    const phone = '923402156834';
+    const responses = {
+      1: 'Yes 💕',
+      2: 'Absolutely! 💖',
+      3: 'A thousand times yes! 🌹',
+    };
+    const choice = responses[intensity] || 'Yes!';
+    const message = encodeURIComponent(
+      `She clicked: ${choice} 💍\n\n— Your proposal website ❤️`
+    );
+    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+  }
+
   // ============================================
   // ACT SEQUENCE
   // ============================================
@@ -266,7 +284,10 @@ class ProposalApp {
   _onYes(intensity) {
     this.celebrationActive = true;
 
-    // 0. Play celebration fanfare (safe — wrapped internally)
+    // 0. Open WhatsApp with her response
+    this._sendWhatsAppMessage(intensity);
+
+    // 1. Play celebration fanfare (safe — wrapped internally)
     if (this.audio) this.audio.playCelebration();
 
     // 1. Explode hearts
