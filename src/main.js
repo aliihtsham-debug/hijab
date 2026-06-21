@@ -10,6 +10,7 @@ import Lighting from './scene/Lighting.js';
 import ParticleSystem from './scene/ParticleSystem.js';
 import HeartField from './scene/HeartField.js';
 import Overlay from './ui/Overlay.js';
+import AudioManager from './scene/AudioManager.js';
 import { TIMING, COLORS } from './utils/constants.js';
 
 // ============================================
@@ -20,10 +21,12 @@ class ProposalApp {
   constructor() {
     this.container = document.getElementById('canvas-container');
     this.overlay = new Overlay();
+    this.audio = new AudioManager();
     this.clock = null;
     this.celebrationActive = false;
     this.celebrationHearts = [];
     this._currentAct = 0;
+    this._lastHeartPopTime = 0;
 
     this._init();
   }
@@ -40,11 +43,18 @@ class ProposalApp {
     this.overlay.enableSkip();
     this.overlay.onMusicToggle(() => this._toggleMusic());
 
+    // Wire up typing sound callback
+    this.overlay.setOnTypeCallback(() => this.audio.playTypeClick());
+
     this._animate();
 
     await this._wait(TIMING.loadingDuration);
     this.overlay.hideLoading();
     this.overlay.showMusicToggle();
+
+    // Initialize audio (creates context, starts music muted)
+    await this.audio.init();
+    this.audio.startMusic();
 
     this._startActSequence();
   }
@@ -214,6 +224,9 @@ class ProposalApp {
   _onYes(intensity) {
     this.celebrationActive = true;
 
+    // 0. Play celebration fanfare
+    this.audio.playCelebration();
+
     // 1. Explode hearts
     this.hearts.explode();
 
@@ -352,6 +365,12 @@ class ProposalApp {
     this.particles.update(clampedDelta, elapsed);
     this.hearts.update(clampedDelta, elapsed);
 
+    // Heart pop sounds — throttle to every 0.8s so it's not overwhelming
+    if (this.hearts.active && elapsed - this._lastHeartPopTime > 0.8) {
+      this.audio.playHeartPop();
+      this._lastHeartPopTime = elapsed;
+    }
+
     this._updateCelebrationParticles(clampedDelta);
   }
 
@@ -397,8 +416,9 @@ class ProposalApp {
   // UTILITIES
   // ============================================
 
-  _toggleMusic() {
-    console.log('Music toggle clicked');
+  async _toggleMusic() {
+    const muted = await this.audio.toggleMute();
+    this.overlay.setMuted(muted);
   }
 
   _wait(ms) {

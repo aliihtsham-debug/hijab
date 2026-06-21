@@ -26,6 +26,9 @@ export default class Overlay {
     // Typing text controller
     this.typingText = new TypingText(this.actMessage);
 
+    // Callback for per-character typing sound (set by main app)
+    this.onTypeCallback = null;
+
     // State
     this.currentAct = 0;
     this._transitioning = false;
@@ -34,6 +37,11 @@ export default class Overlay {
     this.proposalCard.onYes((intensity) => {
       this._handleYes(intensity);
     });
+  }
+
+  /** Set a callback that fires on each typed character */
+  setOnTypeCallback(fn) {
+    this.onTypeCallback = fn;
   }
 
   _handleYes(intensity) {
@@ -125,7 +133,7 @@ export default class Overlay {
     await this._wait(1000);
 
     // Type the message (no CSS opacity transition running during typing)
-    await this.typingText.type(text, 65);
+    await this.typingText.type(text, 65, null, this.onTypeCallback);
 
     // Pause after typing completes
     await this._wait(2000);
@@ -233,7 +241,8 @@ export default class Overlay {
     await this.typingText.typeSequence(
       MESSAGES.act4,
       50,
-      2500
+      2500,
+      this.onTypeCallback
     );
 
     // Wait after last message, then fade it out

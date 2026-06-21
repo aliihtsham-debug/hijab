@@ -38,9 +38,12 @@ export default class TypingText {
 
   /**
    * Type out a string with a typewriter effect.
-   * Uses a plain text node (not childNodes[0]) to avoid layout thrashing.
+   * @param {string} text - Text to type
+   * @param {number} speed - Ms per character
+   * @param {function} onComplete - Called when typing finishes
+   * @param {function} onType - Called per character (for sound effects)
    */
-  type(text, speed = 60, onComplete = null) {
+  type(text, speed = 60, onComplete = null, onType = null) {
     return new Promise((resolve) => {
       // Cancel anything in progress first
       this._cancel();
@@ -61,6 +64,7 @@ export default class TypingText {
       this._typeInterval = setInterval(() => {
         if (i < text.length) {
           textNode.textContent = text.substring(0, i + 1);
+          if (onType) onType();
           i++;
         } else {
           clearInterval(this._typeInterval);
@@ -84,10 +88,11 @@ export default class TypingText {
 
   /**
    * Type multiple messages sequentially with pauses.
+   * @param {function} onType - Called per character (for sound effects)
    */
-  async typeSequence(messages, typeSpeed = 50, pauseBetween = 2000) {
+  async typeSequence(messages, typeSpeed = 50, pauseBetween = 2000, onType = null) {
     for (let i = 0; i < messages.length; i++) {
-      await this.type(messages[i], typeSpeed);
+      await this.type(messages[i], typeSpeed, null, onType);
       if (i < messages.length - 1) {
         await this._wait(pauseBetween);
         await this._fadeOutSync(600);
